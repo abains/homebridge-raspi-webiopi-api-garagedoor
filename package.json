@@ -1,0 +1,22 @@
+{
+  "name": "homebridge-raspi-webiopi-api-garagedoor",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Raspberry Pi control using WebIOPi REST API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abains/homebridge-raspi-webiopi-api-garagedoor.git"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "author": "Amrit Bains",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abains/homebridge-raspi-webiopi-api-garagedoor/issues"
+  },
+  "homepage": "https://github.com/abains/homebridge-raspi-webiopi-api-garagedoor#readme"
+}
