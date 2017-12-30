@@ -163,10 +163,10 @@ RaspPiGPIOGarageDoorAccessory.prototype = {
     },
 
 
-    readPin: function(pin, callback){
+    readPin: function (pin, callback) {
         if (this.remoteAddr !== null) {
             var request = require('sync-request'),
-            url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value";
+                url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value";
             var res = request('GET', url);
             return res.getBody();
         }
@@ -178,7 +178,7 @@ RaspPiGPIOGarageDoorAccessory.prototype = {
     writePin: function (pin, val) {
         if (this.remoteAddr !== null) {
             var request = require('sync-request'),
-            url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value/" + val;
+                url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value/" + val;
             var res = request('POST', url);
             return res.getBody();
         }
