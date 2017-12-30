@@ -1,5 +1,5 @@
 /* jshint node: true */
-//"use strict";
+"use strict";
 var Service;
 var Characteristic;
 var DoorState;
@@ -42,9 +42,9 @@ function RaspPiGPIOGarageDoorAccessory(log, config) {
     this.doorOpensInSeconds = config.doorOpensInSeconds;
     this.closedDoorSensorValue = getVal(config, "closedDoorSensorValue", 1);
     this.openDoorSensorValue = getVal(config, "openDoorSensorValue", 1);
-    this.userName = getVal(config, "username", "test");
-    this.userPassword = getVal(config, "password", "none");
-    this.remoteAddr = getVal(config, "remoteAddr", "localhost:80");
+    this.userName = getVal(config, "userName", "webiopi");
+    this.userPassword = getVal(config, "userPassword", "raspberry");
+    this.remoteAddr = getVal(config, "remoteAddr", null);
     log("Door Switch Pin: " + this.doorSwitchPin);
     log("Door Switch Val: " + (this.relayOn == 1 ? "ACTIVE_HIGH" : "ACTIVE_LOW"));
     log("Door Switch Active Time in ms: " + this.doorSwitchPressTimeInMs);
@@ -114,11 +114,11 @@ RaspPiGPIOGarageDoorAccessory.prototype = {
     },
 
     hasOpenSensor: function () {
-        return this.openDoorSensorPin !== null;
+        return this.openDoorSensorPin !== undefined;
     },
 
     hasClosedSensor: function () {
-        return this.closedDoorSensorPin !== null;
+        return this.closedDoorSensorPin !== undefined;
     },
 
     initService: function () {
@@ -147,51 +147,46 @@ RaspPiGPIOGarageDoorAccessory.prototype = {
         this.currentDoorState.updateValue(isClosed ? DoorState.CLOSED : DoorState.OPEN);
         this.targetDoorState.updateValue(isClosed ? DoorState.CLOSED : DoorState.OPEN);
 
-        /*
-        rpio.open(this.doorSwitchPin, rpio.OUTPUT, this.relayOff);
-        if (this.hasClosedSensor()) {
-            rpio.open(this.closedDoorSensorPin, rpio.INPUT);
+        if (this.remoteAddr === null) {
+            rpio.open(this.doorSwitchPin, rpio.OUTPUT, this.relayOff);
+            if (this.hasClosedSensor()) {
+                rpio.open(this.closedDoorSensorPin, rpio.INPUT);
+            }
+            if (this.hasOpenSensor()) {
+                rpio.open(this.openDoorSensorPin, rpio.INPUT);
+            }
         }
-        if (this.hasOpenSensor()) {
-            rpio.open(this.openDoorSensorPin, rpio.INPUT);
-        }
-        */
     },
 
     getTargetState: function (callback) {
         callback(null, this.targetState);
     },
 
-    readPin: function (pin) {
-        //return rpio.read(pin);
-        var request = require('request'),
-        url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value";
-    
-        request( { url : url },
-            function (error, response, body) {
-            if(error){
-                console.log(error)
-                return;
-            }
-            return body;
-        });        
+
+    readPin: function(pin, callback){
+        if (this.remoteAddr !== null) {
+            var request = require('sync-request'),
+            url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value";
+            var res = request('GET', url);
+            return res.getBody();
+        }
+        else {
+            return rpio.read(pin);
+        }
     },
 
     writePin: function (pin, val) {
-        //rpio.write(this.doorSwitchPin, val);
-        var request = require('request'),
-        url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value/" + val;
-    
-        request( { url : url,
-                   method : "POST" },
-            function (error, response, body) {
-            if(error){
-                console.log(error)
-                return;
-            }
-            return body;
-        });        
-    },
+        if (this.remoteAddr !== null) {
+            var request = require('sync-request'),
+            url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value/" + val;
+            var res = request('POST', url);
+            return res.getBody();
+        }
+        else {
+            return rpio.write(this.doorSwitchPin, val);
+        }
+
+
     },
 
     isClosed: function () {
