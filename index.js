@@ -163,7 +163,7 @@ RaspPiGPIOGarageDoorAccessory.prototype = {
     },
 
 
-    readPin: function (pin, callback) {
+    readPin: function (pin) {
         if (this.remoteAddr !== null) {
             var request = require('sync-request'),
                 url = "http://" + this.userName + ":" + this.userPassword + "@" + this.remoteAddr + "/GPIO/" + pin + "/value";
